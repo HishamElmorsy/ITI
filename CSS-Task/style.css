@@ -1,0 +1,316 @@
+ *{
+            margin: 0;
+        }
+        body{
+            font:16px Arial;
+            position:relative;
+
+        }
+        ul{
+            text-align: center;
+            display: inline-block;
+            margin-left: 200px; 
+        }
+        
+        
+        li {
+            padding: 10px;
+            margin: 5px;
+            align-self: auto;
+            list-style: none;
+            display: inline-block;
+            color:white;
+            font:15px arial;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+
+        li:hover{
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        #basic{
+            Font: Bold 25px Tahoma;
+            color: white;
+            display:inline-block;
+            padding: 10px;
+            margin: 5px;
+            align-self: auto;
+            
+        }
+        basic:hover{
+            cursor: pointer;
+        }
+        #dots{
+            Font: Bold 30px ;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            color: white;
+            display:inline-block;
+            padding: 10px;
+            margin: 5px;
+            align-self: auto;
+            margin-left: 350px;
+            
+        }
+        #dots:hover{
+            cursor: pointer;
+        }
+        .image img{
+            width: 100%;
+            height: 100%;
+        }
+        .image{
+            height: 100vh;
+        }
+        
+        .header{
+            position: absolute;
+        }
+
+        #fpr{
+            align-self: auto;
+            display: inline-block;
+            color:black;
+            font:32px Tahoma;
+            display: inline-block;  
+            width: 47%;
+            margin: 100px;
+        }
+        #bd{
+            align-self: auto;
+            display: inline-block;
+            color:black;
+            font:bold 160px Tahoma;
+            display: inline-block;  
+            
+        }
+        #work
+        {
+            align-self: auto;
+            display: inline-block;
+            color:black;
+            font:16px Tahoma;
+            display: inline-block;  
+            margin: 50px;
+            width: 200px;
+            text-align: center;
+
+            border: 1px solid black;
+            border-radius: 30px;
+            padding: 10px;
+            margin-bottom: 300px
+            
+        }
+        #work:hover{
+            color:white;
+            background-color: black;
+            cursor: pointer;
+        }
+        
+        
+        .imgx{
+            
+            width: 25%;
+            display: inline-block;
+            height: 450px;
+            margin: 30px;
+
+            
+        }
+        .imgx img{
+            width: 100%;
+            height: 100%;
+        }
+        .gallery{
+            margin-left: 150px;
+            margin-bottom: 300px;
+        }
+        .galh{
+            font:bold 21px arial;
+            text-transform:uppercase;
+        }
+        .galh:hover{
+            text-decoration: underline;
+        }
+        .imgx:hover{
+            cursor: pointer;
+        }
+        .aw{
+            
+            width: 300px;
+            display: inline-block;
+            height: 180px;
+            margin: 40px;
+
+            
+        }
+        .aw img{
+            width: 100%;
+            height: 100%;
+        }
+
+        .aw:hover{
+            cursor: pointer;
+                        text-decoration: underline;
+
+        }
+        .Awards{
+            margin-left: 180px;
+            margin-top: 200px;
+            margin-bottom: 300px;
+        }
+        #engh {
+            color: #000000;
+            font: bold 32px Arial;
+            width: 50px;
+        }
+         .eng{
+            
+            width: 300px;
+            display: inline-block;
+            height: 180px;
+            margin: 30px;
+
+            
+        }
+        .eng img{
+            width: 100%;
+            height: 100%;
+        }
+
+        .eng:hover{
+            cursor: pointer;
+                        text-decoration: underline;
+
+        }
+        .engage{
+            margin-left: 180px;
+            margin-top: 200px;
+            margin-bottom: 300px;
+        }
+        
+       .landing {
+  position: relative;
+  height: 100vh;
+}
+.bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hero-text {
+  position: absolute;
+  top: 40%;
+  left: 60px;
+  color: #f9cdcd;
+  transform: translateY(-50%);
+  font-size: 40px;
+}
+.heropr-text {
+  position: absolute;
+  top: 40%;
+  left: 60px;
+  color: #f9cdcd;
+  transform: translateY(-50%);
+  font-size: 16px;
+    display: inline-block;
+
+}
+.hero-text h1 {
+  font-size: 64px;
+  font-weight: bold;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.subtext {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #f9cdcd;
+}
+
+.subtext b {
+  color: #f9cdcd;
+}
+
+.btn {
+  margin-top: 30px;
+  padding: 8px 20px;
+  border: 1px solid #f9cdcd;
+  background: transparent;
+  color: #f9cdcd;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #f9cdcd;
+  color: black;
+}
+.news:hover{
+    cursor: pointer;
+}
+.news-content :hover{
+        text-decoration: underline;
+
+}
+
+.news {
+  margin: 80px 60px;
+  font-family: Arial, sans-serif;
+}
+
+#fnews {
+  font-size: 40px;
+  font-weight: bold;
+    margin-top: 100px;
+        margin-left: 50px;
+
+
+  width: 10;
+}
+
+.news-item {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #ccc;
+  padding: 20px 0;
+}
+
+.news-item:last-child {
+  border-bottom: 1px solid #ccc;
+}
+
+.news-item img {
+  width: 450px;
+  height: 250px;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.news-content {
+  flex: 1;
+}
+
+.news-content h3 {
+  font-size: 40px;
+  font-weight: normal;
+    color: #333;
+  margin: 0 0 100px;
+  margin-top: -60px
+}
+
+.news-meta {
+  font-size: 10px;
+  color: #333;
+  margin: 0;
+}
+
+.arrow {
+  font-size: 32px;
+  margin-left: 20px;
+  margin-top: -200px;
+}
