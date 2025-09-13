@@ -1,0 +1,51 @@
+﻿    import { departments } from "./departments.js";
+
+    console.log(departments); 
+
+    export default class Employee{
+        #firstName
+        #lastName
+        #age
+        #salary
+        constructor(_fName,_lName,_age,_salary)
+        {
+            this.#firstName=_fName;
+            this.#lastName=_lName;
+            this.#age=_age;
+            this.#salary = _salary;
+        }
+
+        set FullName(val){
+            this.#firstName=val
+        }
+        set LastName(val){
+            this.#lastName=val
+        }
+        set Age(val){
+            this.#age = val
+        }
+        set Salary(val){
+            this.#salary=val
+        }
+
+        get FirstName(){
+            return this.#firstName
+        }
+        get LastName(){
+           return this.#lastName
+        }
+        get Age(){
+            return this.#age
+        }
+        get Salary(){
+            return this.#salary
+        }
+        
+        getFullName(){
+            return `${this.#firstName} ${this.LastName}`
+        }
+        
+    }
+    let emp = new Employee("Saleh","Salah",33,33333)
+    console.log(emp.getFullName())
+

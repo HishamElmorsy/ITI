@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+<script>
+    
+    class Person{
+        #name
+        #age
+
+        constructor(_name,_age){
+this.#name=_name
+this.#age=_age
+
+        }
+
+        set Name(val){
+            if(val.length >2){
+               this.#name= val;
+            }
+            else{
+                 this.#name = "User";
+            }
+        }
+        get Name(){
+            return this.#name;
+        }
+        set Age(val){
+            this.#age = val;
+        }
+        get Age()
+        {
+           return this.#age;
+        }
+        introduce(){
+            return `Hi, my name is ${this.Name} and I'm ${this.Age} years old`
+        }
+    }
+
+    class Teacher extends Person{
+        #subject
+        constructor(_name,_age,_subject){
+super(_name,_age)
+this.#subject=_subject
+        }
+        get Subject(){
+            return this.#subject;
+        }
+       set Subject(val){
+        this.#subject = val;
+       }
+       teach(){
+        return `${this.Name} is teaching ${this.#subject}`
+       }
+       introduce(){
+            return `Hi, my name is ${this.Name} and I'm ${this.Age} years old, and I'm teaching ${this.#subject}`
+        }
+       
+    }
+
+    class Student extends Person{
+        #major
+        constructor(_name,_age,_major){
+super(_name,_age)
+this.#major=_major
+        }
+        get Major(){
+            return this.#major;
+        }
+       set Major(val){
+        this.#major = val;
+       }
+       study(){
+        return `${this.Name} is studing ${this.#major}`
+       }
+       introduce(){
+            return `Hi, my name is ${this.Name} and I'm ${this.Age} years old, and I'm studing ${this.#major}`
+        }
+
+    }
+
+     t1 = new Teacher("Samy",40,"Math");
+     s1=new Student("Essam",19,"CS");
+     console.log(t1.teach());
+     console.log(s1.study());
+     console.log(t1.introduce());
+     console.log(s1.introduce());
+
+</script>
+</body>
+</html>

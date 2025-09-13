@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+<script>
+    
+    class Shape{
+        #dim1
+        #dim2
+
+
+        constructor(_dim1=1,_dim2=1){
+this.#dim1=_dim1
+this.#dim2=_dim2
+        }
+        set Dim1(val)
+        {
+            if(val >=1)
+        {
+this.#dim1=val
+        }
+        else {
+            this.#dim1=1
+        }
+            
+        }
+        set Dim2(val)
+        {
+            if(val >=1)
+        {
+this.#dim2=val
+        }
+        else {
+            this.#dim2=1
+        }
+            
+        }
+        get Dim1()
+        {
+            return this.#dim1
+        }
+        get Dim2()
+        {
+            return this.#dim2
+        }
+        calcArea()
+        {
+        }
+    }
+    class Rectangle extends Shape{
+
+        constructor(_dim1=1,_dim2=1){
+super(_dim1,_dim2)
+        }
+
+        calcArea()
+        {
+            return this.Dim1 * this.Dim2;
+        }
+    }
+    class Circle extends Shape{
+
+        constructor(_dim1=1){
+super(_dim1,_dim1)
+        }
+
+        calcArea()
+        {
+            return this.Dim1 * this.Dim1 *3.14;
+        }
+    }
+
+    let shapesArr = [new Rectangle(3,2), new Circle(5),new Rectangle(4)]
+    shapesArr.forEach(shape=> console.log(shape.calcArea()))
+
+
+
+</script>
+</body>
+</html>
