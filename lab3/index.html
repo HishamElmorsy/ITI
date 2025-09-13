@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <style>
+        #title{
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: rgb(199, 63, 0);
+            
+        }
+        #titleHr{
+            width: 700px;
+        }
+        #products{
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 400px;
+        }
+        .product-card img {
+            max-width: 160px;
+            margin-bottom: 10px;
+            object-fit: contain;    
+            margin: 0 auto 10px;   
+            display: block;  
+        }
+        .product-card button {
+            background: rgb(115, 218, 158);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: auto;
+             margin-top: auto;
+  
+        }
+        .product-card button:hover {
+            background: rgb(4, 95, 50);
+        }
+        .cartBtn {
+            background: rgb(199, 63, 0);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+            font-size: large;
+        }
+        .cartBtn:hover  {
+            background: rgb(112, 36, 3);
+        }
+    </style>
+</head>
+
+
+
+<body>
+    <button class="cartBtn">My Cart</button> 
+        <h1 id="title">ITI E-Commerce</h1>
+<hr id="titleHr"/>
+<div id="products">
+
+    
+
+
+    
+    <script>
+let products = document.getElementById("products")
+
+
+let cartBtn = document.querySelector(".cartBtn")
+cartBtn.addEventListener('click',function(){
+    window.location.href="cart.html"
+})
+        fetch('https://fakestoreapi.com/products')
+        .then(res=> res.json())
+        .then(data=> {
+            data.forEach(product => {
+                let item =document.createElement("div")
+                item.classList.add("product-card")
+                item.innerHTML = `
+                <h3>${product.title}</h3>
+                    <img src ="${product.image}" width ="100" />
+                    <p> Price: $${product.price}</p>
+                        <button class="addBtn">Add To Cart</button>`
+                        let addBtn= item.querySelector(".addBtn")
+                        addBtn.addEventListener('click', function (){
+                            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+                            cart.push(product)
+                            localStorage.setItem("cart", JSON.stringify(cart))
+                            window.location.href="cart.html";
+                            
+
+                        })
+                        
+                        products.appendChild(item)
+            });
+        })
+        .catch(error => console.error("Error fetching products: ", error))
+
+        
+    </script>
+
+
+
+</div>
+</body>
+</html>

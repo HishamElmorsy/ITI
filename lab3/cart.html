@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        *{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #title{
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: rgb(199, 63, 0);
+        }
+        #titleHr{
+            width: 700px;
+        }
+        #cartItems {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+}
+
+.cart-card {
+    display: flex;                
+    align-items: center;           
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 15px;
+    gap: 15px;                     
+}
+
+.cart-card img {
+    width: 80px;                  
+    height: 80px;                 
+    object-fit: contain;
+    flex-shrink: 0;               
+}
+
+.cart-card-details {
+    flex: 1;                 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    max-width: 300px;              
+}
+
+.cart-card-details h3 {
+    margin: 0;
+    white-space: nowrap;           
+    overflow: hidden;               
+    text-overflow: ellipsis;      
+}
+
+.cart-card-buttons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+.cart-card button {
+    background: rgb(199, 63, 0);
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    float: right;
+}
+
+.cart-card button:hover {
+    background: rgb(150, 45, 0);
+}
+
+#totalPrice {
+    margin-top: 20px;
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+        .continueBtn {
+            background: rgb(199, 63, 0);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: large;
+        }
+        .continueBtn:hover  {
+            background: rgb(112, 36, 3);
+        }
+
+        #checkoutBtn {
+    margin-top: 10px;
+    float: right;
+}
+
+
+
+    </style>
+</head>
+<body>
+    <button class="continueBtn">Continue shopping</button> 
+        <h1 id="title">My Shopping Cart</h1>
+    <hr id="titleHr"/>
+    <div id="cartItems"></div>
+
+
+<div id="totalPrice">Total: $0</div>
+<button id="checkoutBtn" class="continueBtn">Checkout</button>
+
+
+
+
+
+
+
+    <script>
+let cartItemsDiv=document.getElementById("cartItems")
+let cartFromStorage = JSON.parse(localStorage.getItem("cart")) || []
+let cart = []
+let totalDiv = document.getElementById("totalPrice")
+let totalPrice = 0
+
+
+let continueBtn = document.querySelector(".continueBtn")
+continueBtn.addEventListener('click',function(){
+    window.location.href="index.html"
+})
+function saveCart(){
+    let newCart = []
+    cart.forEach(p => {
+        for(let i=0;i<p.quantity;i++){
+            newCart.push({...p})
+        }
+    })
+    localStorage.setItem("cart", JSON.stringify(newCart))
+}
+
+cartFromStorage.forEach(product => {
+    let exist = cart.find(p=> p.id === product.id)
+    if (exist){
+        exist.quantity +=1
+        
+    }
+    else{
+        cart.push({...product, quantity:1})
+    }
+})
+if (cart.length == 0){
+    cartItemsDiv.innerHTML = `<p>Your cart is empty!</p>`
+
+}
+else{
+    cart.forEach((product,index) => {
+        let item = document.createElement("div")
+        totalPrice += product.price * product.quantity
+
+item.classList.add("cart-card")
+item.innerHTML = `
+    <img src="${product.image}" />
+    <div class="cart-card-details">
+        <h3>${product.title}</h3>
+        <p>Price: $${product.price}</p>
+        <p>Quantity: ${product.quantity}</p>
+        <p>Total: $${(product.price * product.quantity).toFixed(2)}</p>
+        <div class="cart-card-buttons">
+            <button class="increase">+</button>
+            <button class="decrease">-</button>
+            <button class="removeBtn">Remove</button>
+        </div>
+    </div>
+`
+
+
+    let increaseBtn = item.querySelector(".increase")
+    increaseBtn.addEventListener('click', function(){
+        product.quantity +=1
+        saveCart()
+        window.location.reload()
+    })
+
+    let decreaseBtn = item.querySelector(".decrease")
+    decreaseBtn.addEventListener("click", function()  {
+    product.quantity -= 1
+    if(product.quantity <= 0){
+        cart.splice(index, 1)
+    }
+    saveCart()
+    window.location.reload()
+})
+
+    let removeBtn = item.querySelector(".removeBtn")
+    removeBtn.addEventListener('click',function(){
+        cart.splice(index,1)
+        localStorage.setItem("cart",JSON.stringify(cart))
+        window.location.reload()
+    })
+    cartItemsDiv.appendChild(item)
+
+    });
+      totalDiv.textContent = "Total: $" + totalPrice.toFixed(2)
+
+      let checkoutBtn = document.getElementById("checkoutBtn")
+checkoutBtn.addEventListener("click", function() {
+    if(cart.length === 0){
+        alert("Your cart is empty!")
+        return
+    }
+    alert("Checkout completed!")
+    localStorage.removeItem("cart") 
+    window.location.reload()         
+})
+
+
+      
+}
+    </script>
+
+
+
+</div>
+</body>
+</html>
