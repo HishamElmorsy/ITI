@@ -1,0 +1,14 @@
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\bin\Debug\net8.0\Linq Lab 1.exe
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\bin\Debug\net8.0\Linq Lab 1.deps.json
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\bin\Debug\net8.0\Linq Lab 1.runtimeconfig.json
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\bin\Debug\net8.0\Linq Lab 1.dll
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\bin\Debug\net8.0\Linq Lab 1.pdb
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\Linq Lab 1.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\Linq Lab 1.AssemblyInfoInputs.cache
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\Linq Lab 1.AssemblyInfo.cs
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\Linq Lab 1.csproj.CoreCompileInputs.cache
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\Linq Lab 1.dll
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\refint\Linq Lab 1.dll
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\Linq Lab 1.pdb
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\Linq Lab 1.genruntimeconfig.cache
+C:\Users\aisho\OneDrive\repos\Linq Lab 1\Linq Lab 1\obj\Debug\net8.0\ref\Linq Lab 1.dll
