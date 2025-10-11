@@ -1,0 +1,23 @@
+﻿@model Student
+@{
+    ViewData["Title"] = "Edit Student";
+}
+
+<h1>Edit</h1>
+
+<form method="post">
+    <input type="hidden" asp-for="Id" />
+    <label asp-for="Name">Name</label><input asp-for="Name" class="form-control" />
+    <label asp-for="Age">Age</label><input asp-for="Age" class="form-control" />
+    <label asp-for="DeptNo">Department</label><select asp-for="DeptNo" class="form-select">
+        @foreach (var item in ViewBag.depts)
+        {
+            <option value="@item.DeptId">@item.DeptName</option>
+        }
+    </select>
+
+
+    <button asp-action="Edit" asp-controller="student" class="btn btn-warning">Update</button>
+    <button asp-action="Delete" asp-controller="student" class="btn btn-danger">Delete</button>
+
+</form>

@@ -1,0 +1,16 @@
+﻿@model Department
+@{
+    ViewData["Title"] = "Edit Department";
+}
+
+<h1>Edit</h1>
+
+<form method="post">
+    <input type="hidden" asp-for="DeptId"/>
+    <label asp-for="DeptName">Name</label><input asp-for="DeptName" class="form-control" />
+    <label asp-for="Capacity">Capacity</label><input asp-for="Capacity" class="form-control" />
+
+    <button  asp-action="Edit" asp-controller="department" class="btn btn-warning">Update</button>
+    <button  asp-action="Delete" asp-controller="department" class="btn btn-danger">Delete</button>
+
+</form>

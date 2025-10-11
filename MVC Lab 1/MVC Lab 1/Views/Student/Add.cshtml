@@ -1,0 +1,22 @@
+﻿@model Student
+@{
+    ViewData["Title"] = "Add a Student";
+}
+
+<h1>Add a Student</h1>
+<form action="/student/create" method="post">
+    <label asp-for="Name">Name</label> <input asp-for="Name" class="form-control" /><br />
+    <label asp-for="Age">age</label> <input asp-for="Age" class="form-control" /><br />
+
+
+    <select asp-for="DeptNo" class="form-select">
+        @foreach(var item in ViewBag.depts)
+        {
+           <option>@item.DeptName</option>
+        }
+    </select>
+    <input type="submit" value="Add" class="btn btn-success " /><br />
+
+
+</form>
+

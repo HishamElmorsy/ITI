@@ -1,0 +1,48 @@
+﻿@model List<Department>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+
+            <th>Capacity</th>
+
+            <th>Action</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model == null ||Model.Count==0)
+        {
+            <tr>
+<td colspan="4" class="text-center">
+No Departments Found!
+                </td></tr>
+        }
+        else
+        {
+            foreach(var item in Model)
+            {
+                <tr>
+                    <td>@item.DeptId</td>
+                    <td>@item.DeptName</td>
+
+                    <td>@item.Capacity</td>
+                    <td>
+                        <a asp-action="details" asp-controller="department" asp-route-id="@item.DeptId" class="btn btn-info">Details</a>
+                        <a asp-action="edit" asp-controller="department" asp-route-id="@item.DeptId" class="btn btn-warning">Edit</a>
+
+
+                    </td>
+
+</tr>
+            }
+        }
+    </tbody>
+</table>
+<a class="btn btn-success" asp-action="add" asp-controller="department">Add a department</a>
