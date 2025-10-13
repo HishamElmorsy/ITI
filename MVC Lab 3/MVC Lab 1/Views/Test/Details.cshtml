@@ -1,0 +1,49 @@
+﻿@model List<Student>
+@{
+    ViewData["Title"] = "Details";
+}
+@{
+    
+}
+
+<!DOCTYPE html >
+<html>
+
+    <head>
+        <title>Details </title>
+        <link rel="stylesheet" href = "/lib/bootstrap/dist/css/bootstrap.css" />
+        </head>
+    <body>
+        <table class="table table-bordered table-hover" >
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model == null || Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="3">No Students Found!</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Name</td>
+                        <td>@item.Age</td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+        </table>
+        
+    </body>
+</html>
+

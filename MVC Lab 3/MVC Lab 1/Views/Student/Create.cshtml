@@ -1,0 +1,24 @@
+﻿@model CreateStudentVM
+@{
+    ViewData["Title"] = "Add a Student";
+    SelectList deptsl = new SelectList(Model.Departments, "DeptId", "DeptName");
+}
+
+<h1>Add a Student</h1>
+<form action="/student/create" method="post">
+    <label asp-for="Student.Name">Name</label> <input asp-for="Student.Name" class="form-control" /><span asp-validation-for="Student.Name" ></span><br />
+    <label asp-for="Student.Age">age</label> <input asp-for="Student.Age" class="form-control" /><span asp-validation-for="Student.Age" ></span><br />
+    <label asp-for="Student.Email">E-Mail</label> <input asp-for="Student.Email" class="form-control" /><span asp-validation-for="Student.Email"></span><br />
+
+
+
+    <select asp-for="Student.DeptNo" asp-items="deptsl" class="form-select">
+       
+           <option>Select a Department</option>
+        
+    </select> <span asp-validation-for="Student.DeptNo"></span><br />
+    <input type="submit" value="Add" class="btn btn-success " /><br />
+
+
+</form>
+
