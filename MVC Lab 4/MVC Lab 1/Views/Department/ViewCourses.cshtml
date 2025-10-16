@@ -1,0 +1,15 @@
+﻿@model Department
+@{
+    ViewData["Title"] = "ViewCourses";
+}
+
+<h1>View Courses of @Model.DeptName</h1>
+<ul class="list-group">
+    @foreach(var item in Model.Courses)
+    {
+        <li>
+            <a asp-controller="department" asp-action="updatestudentdegree" asp-route-deptid="@Model.DeptId" asp-route-crsid="@item.Id">@item.CrsName</a>
+        </li>
+    }
+</ul>
+

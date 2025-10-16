@@ -1,0 +1,26 @@
+﻿@model GetEditDepartmentCourseVM
+@{
+    ViewData["Title"] = "EditCourses";
+}
+
+<h1>Edit Department Courses</h1>
+<h2>@Model.Department.DeptName</h2>
+<form method="post">
+    <input type="hidden" name="deptid" value="@Model.Department.DeptId"/>
+    Select Courses to Remove 
+    <select multiple name="CoursesToRemove" class="form-select">
+        @foreach(var item in Model.CourseAlreadyExistsInDepartment)
+        {
+            <option value="@item.Id">@item.CrsName</option>
+        }
+    </select>
+    Select Courses to Add
+    <select multiple name="CoursesToAdd" class="form-select">
+        @foreach (var item in Model.CourseDoesntExistInDepartment)
+        {
+            <option value="@item.Id">@item.CrsName</option>
+        }
+    </select>
+    <input type="submit"  value="Update" class="btn btn-warning"/>
+</form>
+
