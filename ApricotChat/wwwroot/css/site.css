@@ -1,0 +1,94 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  /* Apricot background */
+  background:
+    radial-gradient(1200px 600px at 10% 0%, rgba(255, 179, 71, 0.08), transparent 60%),
+    radial-gradient(800px 400px at 90% 10%, rgba(255, 210, 166, 0.15), transparent 60%),
+    linear-gradient(180deg, var(--apricot-50), #fff);
+  background-attachment: fixed;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+/* Apricot theme */
+:root {
+  --apricot: #FFB347;
+  --apricot-50: #FFF7F0;
+  --apricot-100: #FFD2A6;
+  --apricot-200: #FFC280;
+  --apricot-600: #FF9A2A;
+  --apricot-text: #4A3B2A;
+}
+
+.bg-apricot { background-color: var(--apricot) !important; }
+.bg-apricot-50 { background-color: var(--apricot-50) !important; }
+.bg-apricot-100 { background-color: var(--apricot-100) !important; }
+.text-apricot { color: var(--apricot) !important; }
+.text-apricot-dark { color: var(--apricot-text) !important; }
+
+.navbar-apricot { background-color: var(--apricot-50) !important; }
+.navbar-apricot .navbar-brand, .navbar-apricot .nav-link { color: var(--apricot-text) !important; }
+.navbar-apricot .nav-link.active, .navbar-apricot .nav-link:hover { color: var(--apricot-600) !important; }
+
+.btn-apricot {
+  color: #212529;
+  background-color: var(--apricot);
+  border-color: var(--apricot-200);
+}
+.btn-apricot:hover {
+  color: #212529;
+  background-color: var(--apricot-600);
+  border-color: var(--apricot-200);
+}
+
+/* Subtle card translucency for better contrast on patterned background */
+.card.border-0, .card.shadow-sm {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Context menu styling for chat delete */
+.context-menu {
+  background-color: var(--apricot-50);
+  border: 1px solid var(--apricot-100);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 160px;
+}
+.context-menu .dropdown-item {
+  width: 100%;
+  text-align: left;
+  border-radius: 6px;
+}
+.context-menu .dropdown-item.text-danger {
+  color: #8a1d1d; /* deep red for delete */
+  background-color: var(--apricot-100);
+}
+.context-menu .dropdown-item.text-danger:hover {
+  background-color: var(--apricot-200);
+}

@@ -1,0 +1,206 @@
+@model ApricotChat.Models.ChatViewModel
+@{
+    ViewData["Title"] = "Apricot Chat";
+}
+<div class="container py-4">
+    <div class="row">
+        <aside class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-apricot text-dark fw-semibold">Chats</div>
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action" asp-controller="Chat" asp-action="New" asp-route-modelKey="@Model.SelectedModelKey">+ New chat</a>
+                    @if (Model.RecentSessions != null && Model.RecentSessions.Any())
+                    {
+                        foreach (var s in Model.RecentSessions)
+                        {
+                            var active = s.Id == Model.Session.Id ? "active" : "";
+                            <a class="list-group-item list-group-item-action chat-item @active" data-session-id="@s.Id" asp-controller="Chat" asp-action="Index" asp-route-id="@s.Id" asp-route-modelKey="@Model.SelectedModelKey">
+                                Chat #@s.Id
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <div class="list-group-item text-muted">No chats yet</div>
+                    }
+                </div>
+            </div>
+        </aside>
+        <section class="col-md-9">
+            @if (Model.Session != null && Model.Session.Id > 0)
+            {
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-apricot text-dark fw-semibold">Chat Session #@Model.Session.Id</div>
+                    <div id="chatBody" class="card-body bg-apricot-50" style="min-height: 300px; max-height: 60vh; overflow-y: auto;">
+                        @if (Model.Session.Messages != null && Model.Session.Messages.Any())
+                        {
+                            foreach (var m in Model.Session.Messages.OrderBy(m => m.Id))
+                            {
+                                <div class="mb-3">
+                                    <div class="small text-muted">@m.Role</div>
+                                    <div class="p-3 rounded @((m.Role == "assistant") ? "bg-white" : "bg-apricot-100")">@m.Content</div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-muted">Start the conversation...</div>
+                        }
+                    </div>
+                    <div class="card-footer bg-white">
+                        <form id="chatForm" asp-action="SendStream" method="post" class="row g-2 align-items-center" data-session-id="@Model.Session.Id">
+                            <input type="hidden" name="id" value="@Model.Session.Id" />
+                            <div class="col-12 col-md-4">
+                                <select class="form-select" name="modelKey">
+                                    @foreach (var opt in Model.ModelOptions)
+                                    {
+                                        <option value="@opt.Value" selected="@(opt.Value == Model.SelectedModelKey)">@opt.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col">
+                                <input id="messageInput" type="text" name="message" class="form-control" placeholder="Type your message..." />
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-apricot">Send</button>
+                            </div>
+                            @Html.AntiForgeryToken()
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-muted">Select a chat from the left or create a new one.</div>
+            }
+        </section>
+    </div>
+</div>
+
+<!-- Hidden delete form for secure POST with anti-forgery token -->
+<form id="deleteForm" asp-action="Delete" method="post" class="d-none">
+    <input type="hidden" name="id" id="deleteId" />
+    @Html.AntiForgeryToken()
+    <button type="submit">Delete</button>
+    <!-- button required for form validity, but kept hidden -->
+</form>
+
+<!-- Context menu -->
+<div id="chatContextMenu" class="context-menu shadow" style="display:none; position:absolute; z-index: 2000;">
+    <button type="button" class="dropdown-item text-danger" id="ctxDeleteBtn">Delete chat</button>
+</div>
+
+@section Scripts {
+<script>
+    (function(){
+        // SignalR streaming setup (guard if script is unavailable)
+        const sessionId = document.getElementById('chatForm')?.getAttribute('data-session-id');
+        const hasSignalR = typeof window.signalR !== 'undefined' && !!window.signalR.HubConnectionBuilder;
+        let connection = null;
+        let connectPromise = null;
+        let streamingEl = null;
+        function ensureConnection(){
+            if (!sessionId || !hasSignalR) return;
+            if (connection) return;
+            connection = new signalR.HubConnectionBuilder().withUrl('/hubs/chat').withAutomaticReconnect().build();
+            connection.on('chunk', function(text){
+                if (!streamingEl){
+                    streamingEl = document.createElement('div');
+                    streamingEl.className = 'mb-3';
+                    streamingEl.innerHTML = '<div class="small text-muted">assistant (streaming)</div><div class="p-3 rounded bg-white" id="streamText"></div>';
+                    document.getElementById('chatBody').appendChild(streamingEl);
+                    document.getElementById('chatBody').scrollTop = document.getElementById('chatBody').scrollHeight;
+                }
+                const textEl = streamingEl.querySelector('#streamText');
+                if (textEl){ textEl.textContent = text; }
+                document.getElementById('chatBody').scrollTop = document.getElementById('chatBody').scrollHeight;
+            });
+            connection.on('completed', function(){
+                streamingEl = null;
+            });
+            connectPromise = connection.start().then(function(){
+                return connection.invoke('JoinSession', sessionId.toString());
+            }).catch(console.error);
+        }
+
+        ensureConnection();
+
+        // Intercept chat form submit for streaming
+        const chatForm = document.getElementById('chatForm');
+        if (chatForm){
+            chatForm.addEventListener('submit', function(e){
+                e.preventDefault();
+                const form = e.currentTarget;
+                const formData = new FormData(form);
+                const msg = formData.get('message');
+                if (!msg || (msg + '').trim() === '') return;
+
+                // Optimistically render the user message
+                const userWrap = document.createElement('div');
+                userWrap.className = 'mb-3';
+                userWrap.innerHTML = '<div class="small text-muted">user</div><div class="p-3 rounded bg-apricot-100"></div>';
+                userWrap.querySelector('div.p-3').textContent = msg;
+                document.getElementById('chatBody').appendChild(userWrap);
+                document.getElementById('chatBody').scrollTop = document.getElementById('chatBody').scrollHeight;
+
+                // Ensure SignalR connection before posting so chunks are received live
+                const post = function(){
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    }).then(function(resp){
+                        if (!hasSignalR){
+                            const id = formData.get('id');
+                            const modelKey = formData.get('modelKey');
+                            const url = `/Chat/Index?id=${encodeURIComponent(id)}&modelKey=${encodeURIComponent(modelKey)}`;
+                            window.location.href = url;
+                        }
+                    }).catch(console.error);
+                };
+
+                if (hasSignalR && connectPromise){
+                    connectPromise.then(post);
+                } else {
+                    post();
+                }
+
+                // Clear input
+                const input = document.getElementById('messageInput');
+                if (input) input.value = '';
+
+                // Keep scrolled to bottom after layout updates
+                const chatBody = document.getElementById('chatBody');
+                setTimeout(function(){ chatBody.scrollTop = chatBody.scrollHeight; }, 0);
+            });
+        }
+        const menu = document.getElementById('chatContextMenu');
+        const deleteBtn = document.getElementById('ctxDeleteBtn');
+        const deleteForm = document.getElementById('deleteForm');
+        const deleteId = document.getElementById('deleteId');
+        let targetSessionId = null;
+
+        function hideMenu(){ menu.style.display = 'none'; }
+        function showMenu(x,y){ menu.style.left = x + 'px'; menu.style.top = y + 'px'; menu.style.display = 'block'; }
+
+        document.addEventListener('click', function(){ hideMenu(); });
+        window.addEventListener('scroll', hideMenu, true);
+        window.addEventListener('resize', hideMenu);
+
+        document.querySelectorAll('.chat-item').forEach(function(el){
+            el.addEventListener('contextmenu', function(e){
+                e.preventDefault();
+                targetSessionId = this.getAttribute('data-session-id');
+                showMenu(e.pageX, e.pageY);
+            });
+        });
+
+        deleteBtn.addEventListener('click', function(){
+            if (!targetSessionId) return;
+            deleteId.value = targetSessionId;
+            hideMenu();
+            deleteForm.submit();
+        });
+    })();
+</script>
+}
