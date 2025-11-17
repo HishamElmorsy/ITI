@@ -1,8 +1,7 @@
 ﻿using API_Lab2.DTO.DepartmentDTO;
-using API_Lab2.DTO.StudentDTO;
 using API_Lab2.Models;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +9,7 @@ namespace API_Lab2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class DepartmentsController : ControllerBase
     {
         

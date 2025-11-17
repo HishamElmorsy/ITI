@@ -1,7 +1,7 @@
 ﻿using API_Lab2.DTO.StudentDTO;
 using API_Lab2.Models;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +9,7 @@ namespace API_Lab2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class StudentsController : ControllerBase
     {
         ItiContext db;
@@ -28,7 +29,8 @@ namespace API_Lab2.Controllers
             if(!string.IsNullOrEmpty(search))
             {
                 query = query.Where(st =>
-                st.StFname.Contains(search) || st.StLname.Contains(search));
+                    (st.StFname != null && st.StFname.Contains(search)) ||
+                    (st.StLname != null && st.StLname.Contains(search)));
             }
             var totalStudents = query.Count();
 
