@@ -1,0 +1,33 @@
+<div class="container mt-3">
+  <h3>Department Details</h3>
+
+  @if (isLoading) {
+  <div class="alert alert-info mt-3">Loading department...</div>
+  } @else if (errorMessage) {
+  <div class="alert alert-warning mt-3">{{ errorMessage }}</div>
+  } @else if (dept) {
+  <ul class="list-group mb-3">
+    <li class="list-group-item"><strong>ID:</strong> {{ dept.DeptId }}</li>
+    <li class="list-group-item"><strong>Name:</strong> {{ dept.DeptName }}</li>
+    <li class="list-group-item"><strong>Description:</strong> {{ dept.DeptDesc ?? 'N/A' }}</li>
+    <li class="list-group-item"><strong>Location:</strong> {{ dept.DeptLocation ?? 'N/A' }}</li>
+    <li class="list-group-item"><strong>Manager Id:</strong> {{ dept.DeptManager ?? 'N/A' }}</li>
+  </ul>
+
+  <div>
+    <h5>Students</h5>
+    @if (dept.Students?.length) {
+    <ul class="list-group">
+      @for (student of dept.Students; track student.StId) {
+      <li class="list-group-item d-flex justify-content-between">
+        <span>{{ student.StFname }} ({{ student.StId }})</span>
+        <span class="text-muted">{{ student.StAddress ?? 'No address' }}</span>
+      </li>
+      }
+    </ul>
+    } @else {
+    <p class="text-muted">No students enrolled.</p>
+    }
+  </div>
+  }
+</div>

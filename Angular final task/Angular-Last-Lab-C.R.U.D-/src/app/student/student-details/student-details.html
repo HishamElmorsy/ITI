@@ -1,0 +1,19 @@
+<div class="container mt-3">
+  <h3>Student Details</h3>
+
+  @if (isLoading) {
+  <div class="alert alert-info">Loading student...</div>
+  } @else if (errorMessage) {
+  <div class="alert alert-warning">{{ errorMessage }}</div>
+  } @else if (student) {
+  <ul class="list-group">
+    <li class="list-group-item"><strong>ID:</strong> {{ student.StId }}</li>
+    <li class="list-group-item"><strong>Name:</strong> {{ student.StFname }} {{ student.StLname }}</li>
+    <li class="list-group-item"><strong>Age:</strong> {{ student.StAge ?? 'N/A' }}</li>
+    <li class="list-group-item"><strong>Address:</strong> {{ student.StAddress ?? 'N/A' }}</li>
+    <li class="list-group-item"><strong>Department:</strong> {{ student.DeptName ?? 'N/A' }}</li>
+    <li class="list-group-item"><strong>Supervisor:</strong> {{ student.StSuperName ?? 'N/A' }}</li>
+  </ul>
+  }
+</div>
+

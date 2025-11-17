@@ -1,0 +1,32 @@
+<section>
+
+    <div class="container mt-3">
+        <h1>Add Department</h1>
+        <form (ngSubmit)="addDepartment()" class="border p-3 rounded bg-light">
+            <label for="name">Dept. Name</label>
+            <input type="text" [(ngModel)]="newDept.DeptName" name="name" placeholder="Name"
+                class="form-control mb-2" required />
+
+            <label for="desc">Description</label>
+            <textarea [(ngModel)]="newDept.DeptDesc" name="desc" placeholder="Description"
+                class="form-control mb-2"></textarea>
+
+            <label for="loc">Location</label>
+            <input type="text" [(ngModel)]="newDept.DeptLocation" name="loc" placeholder="Location"
+                class="form-control mb-2" />
+
+            <label for="manager">Manager Id</label>
+            <input type="number" [(ngModel)]="newDept.DeptManager" name="manager" placeholder="Manager Id"
+                class="form-control mb-3" />
+
+            <div *ngIf="errorMessage" class="alert alert-danger">
+                {{ errorMessage }}
+            </div>
+
+            <button class="btn btn-primary" [disabled]="isSubmitting">
+                {{ isSubmitting ? 'Saving...' : 'Add' }}
+            </button>
+        </form>
+    </div>
+
+</section>

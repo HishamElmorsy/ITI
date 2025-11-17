@@ -1,0 +1,54 @@
+<section>
+  <div class="container mt-3">
+    <h3>All Students</h3>
+
+    <form class="row g-2 align-items-center mb-3" (ngSubmit)="refresh()">
+      <div class="col-sm-9">
+        <input
+          class="form-control"
+          type="text"
+          name="search"
+          [(ngModel)]="searchText"
+          placeholder="Search by name"
+        />
+      </div>
+      <div class="col-sm-3 d-grid">
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+    </form>
+
+    @if (isLoading) {
+    <div class="alert alert-info">Loading students...</div>
+    } @else if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+    } @else {
+    <table class="table table-bordered table-striped table-hover text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Department</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (student of students; track student.StId) {
+        <tr>
+          <td>{{ student.StId }}</td>
+          <td>{{ student.StFname }}</td>
+          <td>{{ student.StAge ?? '-' }}</td>
+          <td>{{ student.DeptName ?? '-' }}</td>
+          <td class="d-flex justify-content-evenly">
+            <button class="btn btn-info btn" (click)="showDetails(student)">Details</button>
+            <button class="btn btn-warning btn" [routerLink]="['/student/update', student.StId]">Update</button>
+            <button class="btn btn-danger btn" [routerLink]="['/student/delete', student.StId]">Delete</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    }
+  </div>
+</section>
+

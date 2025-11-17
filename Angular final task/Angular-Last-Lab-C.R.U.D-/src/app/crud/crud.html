@@ -1,0 +1,99 @@
+<div class="container py-4">
+  <h2 class="text-center mb-4">Student CRUD (API powered)</h2>
+
+  <form class="row g-2 align-items-center mb-4" (ngSubmit)="refresh()">
+    <div class="col-sm-9">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search students by name"
+        [(ngModel)]="searchText"
+        name="search"
+      />
+    </div>
+    <div class="col-sm-3 d-grid">
+      <button type="submit" class="btn btn-outline-primary">Search</button>
+    </div>
+  </form>
+
+  <form class="border p-3 rounded bg-light mb-4" (ngSubmit)="submitStudent()">
+    <h4 class="mb-3">{{ isEditing ? 'Update Student' : 'Add Student' }}</h4>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">First Name</label>
+        <input type="text" class="form-control" [(ngModel)]="newStudent.StFname" name="fname" required />
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Last Name</label>
+        <input type="text" class="form-control" [(ngModel)]="newStudent.StLname" name="lname" />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Age</label>
+        <input type="number" class="form-control" [(ngModel)]="newStudent.StAge" name="age" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Address</label>
+        <input type="text" class="form-control" [(ngModel)]="newStudent.StAddress" name="address" />
+      </div>
+    </div>
+    <div class="row g-3 mt-1">
+      <div class="col-md-3">
+        <label class="form-label">Department Id</label>
+        <input type="number" class="form-control" [(ngModel)]="newStudent.DeptId" name="dept" />
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Supervisor Id</label>
+        <input type="number" class="form-control" [(ngModel)]="newStudent.StSuper" name="super" />
+      </div>
+      <div class="col-md-6 d-flex align-items-end justify-content-end gap-2">
+        @if (isEditing) {
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+        }
+        <button class="btn btn-primary" [disabled]="isSubmitting">
+          {{ isEditing ? 'Save Changes' : 'Add Student' }}
+        </button>
+      </div>
+    </div>
+  </form>
+
+  @if (errorMessage) {
+  <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+  <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  @if (isLoading) {
+  <div class="alert alert-info">Loading students...</div>
+  } @else {
+  <table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Address</th>
+        <th>Department</th>
+        <th>Supervisor</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (student of students; track student.StId) {
+      <tr>
+        <td>{{ student.StId }}</td>
+        <td>{{ student.StFname }} {{ student.StLname }}</td>
+        <td>{{ student.StAge ?? '-' }}</td>
+        <td>{{ student.StAddress ?? '-' }}</td>
+        <td>{{ student.DeptName ?? student.DeptId ?? '-' }}</td>
+        <td>{{ student.StSuperName ?? student.StSuper ?? '-' }}</td>
+        <td class="d-flex justify-content-evenly">
+          <button class="btn btn-warning btn-sm" (click)="startEdit(student)">Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteStudent(student)">Delete</button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+</div>

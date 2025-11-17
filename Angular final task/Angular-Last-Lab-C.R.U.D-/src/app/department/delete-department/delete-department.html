@@ -1,0 +1,12 @@
+<div class="container mt-3">
+  <h3>Delete Department</h3>
+  <form (ngSubmit)="deleteDepartment()" class="border p-3 rounded bg-light">
+    <input type="number" [(ngModel)]="deptId" name="id" placeholder="Confirm Department ID" class="form-control mb-2" required />
+
+    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+    <button class="btn btn-danger" [disabled]="isDeleting">
+      {{ isDeleting ? 'Deleting...' : 'Delete' }}
+    </button>
+  </form>
+</div>

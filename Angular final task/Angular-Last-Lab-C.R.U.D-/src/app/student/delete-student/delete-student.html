@@ -1,0 +1,15 @@
+<section class="container mt-3">
+  <h3>Delete Student</h3>
+  <div class="border p-3 rounded bg-light text-center">
+    <p>Are you sure you want to delete student with ID <strong>{{ studentId }}</strong>?</p>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <button class="btn btn-danger me-2" (click)="deleteStudent()" [disabled]="isDeleting">
+      {{ isDeleting ? 'Deleting...' : 'Yes, Delete' }}
+    </button>
+    <button class="btn btn-secondary" routerLink="/student/get-student">Cancel</button>
+  </div>
+</section>

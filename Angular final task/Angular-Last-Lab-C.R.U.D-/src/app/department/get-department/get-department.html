@@ -1,0 +1,36 @@
+<div class="container mt-3">
+  <h3>All Departments</h3>
+
+  @if (isLoading) {
+  <div class="alert alert-info mt-3">Loading departments...</div>
+  } @else if (errorMessage) {
+  <div class="alert alert-danger mt-3">{{ errorMessage }}</div>
+  } @else {
+  <table class="table table-bordered table-striped table-hover text-center">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Manager</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (dept of departments; track dept.DeptId) {
+      <tr>
+        <td>{{ dept.DeptId }}</td>
+        <td>{{ dept.DeptName }}</td>
+        <td>{{ dept.DeptLocation ?? '-' }}</td>
+        <td>{{ dept.DeptManager ?? '-' }}</td>
+        <td class="d-flex justify-content-evenly">
+          <button class="btn btn-info btn" (click)="showDetails(dept)">Details</button>
+          <button class="btn btn-warning btn" [routerLink]="['/department/update', dept.DeptId]">Update</button>
+          <button class="btn btn-danger btn" [routerLink]="['/department/delete', dept.DeptId]">Delete</button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+</div>

@@ -1,0 +1,33 @@
+<section>
+    <div class="container mt-3">
+        <h1>Update Department</h1>
+
+        @if (isLoading) {
+        <div class="alert alert-info mt-3">Loading department...</div>
+        } @else {
+        <form (ngSubmit)="updateDepartment()" class="border p-3 rounded bg-light">
+            <label for="name">Dept. Name</label>
+            <input type="text" [(ngModel)]="deptForm.DeptName" name="name" placeholder="New Name"
+                class="form-control mb-2" required />
+
+            <label for="desc">Description</label>
+            <textarea [(ngModel)]="deptForm.DeptDesc" name="desc" placeholder="New Description"
+                class="form-control mb-2"></textarea>
+
+            <label for="loc">Location</label>
+            <input type="text" [(ngModel)]="deptForm.DeptLocation" name="loc" placeholder="New Location"
+                class="form-control mb-2" />
+
+            <label for="manager">Manager Id</label>
+            <input type="number" [(ngModel)]="deptForm.DeptManager" name="manager" placeholder="Manager Id"
+                class="form-control mb-2" />
+
+            <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+            <button class="btn btn-success" [disabled]="isSubmitting">
+                {{ isSubmitting ? 'Updating...' : 'Update' }}
+            </button>
+        </form>
+        }
+    </div>
+</section>

@@ -1,0 +1,54 @@
+<section>
+    <!--products-->
+    <!-- <div class="container">
+        <div class="row g-4 mb-5">
+            @for (product of products; track product.id) {
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <img [src]="product.imageUrl" class="card-img-top w-100" alt="{{product.name}}">
+
+                    @if (product.isOnSale) {
+                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">ON SALE !!</span>
+                    }
+                    @if (product.isNewArrival) {
+                    <span class="badge bg-success position-absolute top-0 end-0 m-2">NEW ARRIVAL !!</span>
+                    }
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted">{{ product.description }}</p>
+                        <p class="fw-bold text-primary">${{ product.price }}</p>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </div> -->
+
+    <!-- recipes -->
+
+    <div class="row" *ngIf="!isLoading && dataRecipes.length > 0">
+        <h1 class="fw-bold text-center"> Api Testing (Recipes)</h1>
+        <div class="col-md-4 mb-4" *ngFor="let recipe of dataRecipes">
+            <div class="card h-100 shadow-sm">
+
+                <img *ngIf="recipe.image_url" [src]="recipe.image_url" class="card-img-top w-100 h-100"
+                    alt="Recipe Image">
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ recipe.title }}</h5>
+                    <p class="card-text text-muted">{{ recipe.publisher }}</p>
+                </div>
+
+                <div class="card-footer bg-white border-0">
+                    <button class="btn btn-primary w-100">View Details</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+</section>

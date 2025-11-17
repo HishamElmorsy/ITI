@@ -1,0 +1,67 @@
+<section>
+  <div class="container mt-3">
+    <h1>Add Student</h1>
+    <form (ngSubmit)="addStudent()" class="border p-3 rounded bg-light">
+      <label for="fname">First Name</label>
+      <input
+        type="text"
+        [(ngModel)]="newStudent.StFname"
+        name="fname"
+        placeholder="First Name"
+        class="form-control mb-2"
+        required
+      />
+
+      <label for="lname">Last Name</label>
+      <input
+        type="text"
+        [(ngModel)]="newStudent.StLname"
+        name="lname"
+        placeholder="Last Name"
+        class="form-control mb-2"
+      />
+
+      <label for="age">Age</label>
+      <input
+        type="number"
+        [(ngModel)]="newStudent.StAge"
+        name="age"
+        placeholder="Age"
+        class="form-control mb-2"
+      />
+
+      <label for="address">Address</label>
+      <input
+        type="text"
+        [(ngModel)]="newStudent.StAddress"
+        name="address"
+        placeholder="Address"
+        class="form-control mb-2"
+      />
+
+      <label for="dept">Department</label>
+      <select [(ngModel)]="newStudent.DeptId" name="dept" class="form-select mb-2">
+        <option [ngValue]="undefined">-- Select Department --</option>
+        @for (dept of departments; track dept.DeptId) {
+        <option [ngValue]="dept.DeptId">{{ dept.DeptName }}</option>
+        }
+      </select>
+
+      <label for="super">Supervisor Id (optional)</label>
+      <input
+        type="number"
+        [(ngModel)]="newStudent.StSuper"
+        name="super"
+        placeholder="Supervisor Id"
+        class="form-control mb-3"
+      />
+
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+      <button class="btn btn-primary" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Saving...' : 'Add' }}
+      </button>
+    </form>
+  </div>
+</section>
+
