@@ -1,0 +1,147 @@
+@{
+    ViewBag.Title = "Apricot Chat";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<style>
+:root {
+  --apricot: #FFB347;
+  --apricot-50: #FFF7F0;
+  --apricot-100: #FFD2A6;
+  --apricot-200: #FFC280;
+  --apricot-600: #FF9A2A;
+  --apricot-text: #4A3B2A;
+}
+body {
+  background: radial-gradient(1200px 600px at 10% 0%, rgba(255, 179, 71, 0.08), transparent 60%),
+              radial-gradient(800px 400px at 90% 10%, rgba(255, 210, 166, 0.15), transparent 60%),
+              linear-gradient(180deg, var(--apricot-50), #fff);
+  background-attachment: fixed;
+}
+.bg-apricot { background-color: var(--apricot) !important; }
+.bg-apricot-50 { background-color: var(--apricot-50) !important; }
+.bg-apricot-100 { background-color: var(--apricot-100) !important; }
+.btn-apricot {
+  color: #212529;
+  background-color: var(--apricot);
+  border-color: var(--apricot-200);
+}
+.btn-apricot:hover {
+  color: #212529;
+  background-color: var(--apricot-600);
+  border-color: var(--apricot-200);
+}
+.card { background-color: rgba(255, 255, 255, 0.95); }
+</style>
+
+<div class="container py-5" style="max-width: 800px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-apricot text-dark fw-semibold">
+            <h4 class="mb-0"> Apricot Chat - AI File Analyzer</h4>
+        </div>
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(ViewBag.Message))
+            {
+                <div class="alert alert-success d-flex justify-content-between align-items-center">
+                    <span>@ViewBag.Message</span>
+                    @if (ViewBag.CurrentFile != null)
+                    {
+                        <button type="button" class="btn btn-sm btn-outline-dark" onclick="document.getElementById('uploadForm').style.display='block'; this.parentElement.style.display='none';">📤 Upload New File</button>
+                    }
+                </div>
+            }
+            
+            <!-- File Upload Form -->
+            <form id="uploadForm" asp-action="Upload" enctype="multipart/form-data" method="post" class="mb-4" style="display: @(ViewBag.CurrentFile == null ? "block" : "none")">
+                <div class="input-group">
+                    <input type="file" name="file" class="form-control" accept=".txt,.pdf,.docx" required />
+                    <button type="submit" class="btn btn-apricot">📤 Upload File</button>
+                </div>
+                <small class="text-muted">Supported: TXT, PDF, DOCX</small>
+            </form>
+
+            <!-- File Selector -->
+            @if (ViewBag.UploadedFiles != null && ((List<AiFileAnalyzerMvc.Models.FileData>)ViewBag.UploadedFiles).Count > 1)
+            {
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Select a file to chat with:</label>
+                    <form asp-action="SelectFile" method="post">
+                        <div class="input-group">
+                            <select name="fileName" class="form-select" onchange="this.form.submit()">
+                                @foreach (var file in (List<AiFileAnalyzerMvc.Models.FileData>)ViewBag.UploadedFiles)
+                                {
+                                    var selected = ViewBag.CurrentFile != null && file.FileName == ((AiFileAnalyzerMvc.Models.FileData)ViewBag.CurrentFile).FileName;
+                                    <option value="@file.FileName" selected="@selected">@file.FileName</option>
+                                }
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            }
+
+            <!-- Chat Display -->
+            <div id="chat-box" class="border rounded p-3 bg-apricot-50 mb-3" style="height: 400px; overflow-y: auto;">
+                <div class="text-muted text-center py-5">Upload a file and start asking questions...</div>
+            </div>
+
+            <!-- Ask Form -->
+            <form id="askForm" method="post" class="d-flex gap-2">
+                <input type="text" name="question" id="question" class="form-control" placeholder="Ask about the uploaded file..." required />
+                <button type="submit" class="btn btn-apricot">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const askForm = document.getElementById("askForm");
+    const chatBox = document.getElementById("chat-box");
+
+    askForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const questionInput = document.getElementById("question");
+        const q = questionInput.value.trim();
+        if (!q) return;
+
+        // Clear initial message if present
+        if (chatBox.querySelector('.text-muted')) {
+            chatBox.innerHTML = '';
+        }
+
+        // Show user message
+        chatBox.innerHTML += `
+            <div class="mb-3">
+                <div class="small text-muted">You</div>
+                <div class="p-3 rounded bg-white shadow-sm">${q}</div>
+            </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Call backend
+        const res = await fetch('/Chat/Ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ question: q })
+        });
+
+        const data = await res.json();
+
+        // Show AI response with similarity badge
+        const similarity = Number(data.similarity).toFixed(1);
+        const badgeColor = similarity >= 70 ? 'success' : similarity >= 40 ? 'warning' : 'secondary';
+        chatBox.innerHTML += `
+            <div class="mb-3">
+                <div class="small text-muted">
+                    Assistant 
+                    <span class="badge bg-${badgeColor}">Relevant: ${similarity}%</span>
+                </div>
+                <div class="p-3 rounded bg-apricot-100 shadow-sm">${data.answer}</div>
+            </div>
+        `;
+
+        // Scroll and reset
+        chatBox.scrollTop = chatBox.scrollHeight;
+        questionInput.value = "";
+    });
+</script>
