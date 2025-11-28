@@ -1,0 +1,315 @@
+{
+    "name": "AI Assistant RAG Workflow - OpenAI + Vector DB",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "webhook/ask-rag",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-rag-trigger-001",
+            "name": "Webhook Trigger",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "ai-assistant-rag-webhook"
+        },
+        {
+            "parameters": {
+                "functionCode": "// RAG Node 1: Input Validation\n\nconst body = items[0].json.body || items[0].json;\n\n// Validate prompt\nif (!body.prompt || typeof body.prompt !== 'string' || body.prompt.trim().length === 0) {\n  throw new Error('Invalid or missing prompt. Please provide a valid prompt string.');\n}\n\nif (body.prompt.length > 4000) {\n  throw new Error('Prompt is too long. Maximum length is 4000 characters.');\n}\n\nreturn [\n  {\n    json: {\n      userId: body.userId || 'anonymous',\n      prompt: body.prompt,\n      metadata: body.metadata || {},\n      timestamp: new Date().toISOString()\n    }\n  }\n];"
+            },
+            "id": "function-rag-validate-001",
+            "name": "Validate Input",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "// RAG Node 2: Generate Query Embedding\n\nconst prompt = items[0].json.prompt;\nconst embeddingModel = $env.EMBEDDING_MODEL || 'text-embedding-3-small';\nconst openaiApiKey = $env.LLM_API_KEY;\n\nif (!openaiApiKey) {\n  throw new Error('LLM_API_KEY environment variable is not configured.');\n}\n\n// Prepare embedding request\nconst embeddingPayload = {\n  model: embeddingModel,\n  input: prompt\n};\n\nreturn [\n  {\n    json: {\n      embeddingPayload: embeddingPayload,\n      openaiApiKey: openaiApiKey,\n      originalPrompt: prompt,\n      userData: items[0].json\n    }\n  }\n];"
+            },
+            "id": "function-prepare-embedding-001",
+            "name": "Prepare Embedding Request",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.openai.com/v1/embeddings",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $json.openaiApiKey }}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify($json.embeddingPayload) }}",
+                "options": {}
+            },
+            "id": "http-embedding-001",
+            "name": "Generate Embedding",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                850,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "// RAG Node 3: Query Vector Database\n\nconst embeddingResponse = items[0].json;\nconst embedding = embeddingResponse.data[0].embedding;\nconst userData = items[0].json.userData;\n\n// Get vector DB configuration\nconst vectorDbUrl = $env.VECTOR_DB_URL || 'https://your-pinecone-instance.pinecone.io';\nconst vectorDbApiKey = $env.VECTOR_DB_API_KEY;\nconst vectorDbNamespace = $env.VECTOR_DB_NAMESPACE || 'default';\nconst topK = 5; // Number of similar documents to retrieve\n\nif (!vectorDbApiKey) {\n  throw new Error('VECTOR_DB_API_KEY environment variable is not configured.');\n}\n\n// Prepare Pinecone query payload\nconst queryPayload = {\n  vector: embedding,\n  topK: topK,\n  includeMetadata: true,\n  namespace: vectorDbNamespace\n};\n\nreturn [\n  {\n    json: {\n      queryPayload: queryPayload,\n      vectorDbUrl: vectorDbUrl,\n      vectorDbApiKey: vectorDbApiKey,\n      userData: userData\n    }\n  }\n];"
+            },
+            "id": "function-prepare-vector-query-001",
+            "name": "Prepare Vector Query",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $json.vectorDbUrl }}/query",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Api-Key",
+                            "value": "={{ $json.vectorDbApiKey }}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify($json.queryPayload) }}",
+                "options": {}
+            },
+            "id": "http-vector-query-001",
+            "name": "Query Vector DB",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "// RAG Node 4: Merge Retrieved Context with User Prompt\n\nconst vectorResults = items[0].json;\nconst userData = items[0].json.userData;\nconst matches = vectorResults.matches || [];\n\n// Extract text from retrieved documents\nlet retrievedContext = '';\nconst references = [];\n\nif (matches.length > 0) {\n  retrievedContext = '\\n\\nRelevant information from knowledge base:\\n\\n';\n  \n  matches.forEach((match, index) => {\n    if (match.metadata && match.metadata.text) {\n      retrievedContext += `[${index + 1}] ${match.metadata.text}\\n\\n`;\n      \n      references.push({\n        id: match.id,\n        score: match.score,\n        source: match.metadata.source || 'Unknown',\n        text: match.metadata.text.substring(0, 200) + '...'\n      });\n    }\n  });\n}\n\n// Prepare enhanced LLM prompt\nconst llmModel = $env.LLM_MODEL || 'gpt-4o-mini';\nconst language = userData.metadata?.language || 'en';\n\nlet systemPrompt = 'You are a helpful AI assistant. Use the provided context to answer the user\\'s question accurately. If the context doesn\\'t contain relevant information, say so and provide a general answer.';\n\nif (language === 'ar') {\n  systemPrompt = 'أنت مساعد ذكاء اصطناعي مفيد. استخدم السياق المقدم للإجابة على سؤال المستخدم بدقة. إذا لم يحتوي السياق على معلومات ذات صلة، فاذكر ذلك وقدم إجابة عامة.';\n}\n\nconst enhancedPrompt = userData.originalPrompt + retrievedContext;\n\nconst llmPayload = {\n  model: llmModel,\n  messages: [\n    {\n      role: 'system',\n      content: systemPrompt\n    },\n    {\n      role: 'user',\n      content: enhancedPrompt\n    }\n  ],\n  temperature: 0.7,\n  max_tokens: 1500\n};\n\nreturn [\n  {\n    json: {\n      llmPayload: llmPayload,\n      references: references,\n      userData: userData\n    }\n  }\n];"
+            },
+            "id": "function-merge-context-001",
+            "name": "Merge Context with Prompt",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                1450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.openai.com/v1/chat/completions",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $env.LLM_API_KEY }}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify($json.llmPayload) }}",
+                "options": {}
+            },
+            "id": "http-llm-rag-001",
+            "name": "Call OpenAI with Context",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "// RAG Node 5: Format Final Response\n\nconst llmResponse = items[0].json;\nconst references = items[0].json.references || [];\n\nlet responseText = '';\nlet status = 'ok';\nlet errorMessage = null;\n\ntry {\n  if (llmResponse.choices && llmResponse.choices.length > 0) {\n    responseText = llmResponse.choices[0].message.content;\n  } else if (llmResponse.error) {\n    status = 'error';\n    errorMessage = llmResponse.error.message || 'Unknown error from LLM provider';\n    responseText = null;\n  } else {\n    status = 'error';\n    errorMessage = 'Unexpected response format from LLM provider';\n    responseText = null;\n  }\n} catch (error) {\n  status = 'error';\n  errorMessage = error.message || 'Error processing LLM response';\n  responseText = null;\n}\n\nconst formattedResponse = {\n  status: status,\n  workflowId: $execution.id,\n  response: responseText,\n  message: errorMessage,\n  references: references,\n  metadata: {\n    model: llmResponse.model || $env.LLM_MODEL || 'gpt-4o-mini',\n    usage: llmResponse.usage || null,\n    retrievalCount: references.length,\n    timestamp: new Date().toISOString(),\n    ragEnabled: true\n  }\n};\n\nif (status === 'ok') {\n  delete formattedResponse.message;\n}\n\nreturn [\n  {\n    json: formattedResponse\n  }\n];"
+            },
+            "id": "function-format-rag-001",
+            "name": "Format RAG Response",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                1850,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify($json) }}",
+                "options": {
+                    "responseHeaders": {
+                        "entries": [
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ]
+                    }
+                }
+            },
+            "id": "respond-webhook-rag-001",
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                2050,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Validate Input",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Validate Input": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Embedding Request",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Embedding Request": {
+            "main": [
+                [
+                    {
+                        "node": "Generate Embedding",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Generate Embedding": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Vector Query",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Vector Query": {
+            "main": [
+                [
+                    {
+                        "node": "Query Vector DB",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Query Vector DB": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Context with Prompt",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge Context with Prompt": {
+            "main": [
+                [
+                    {
+                        "node": "Call OpenAI with Context",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Call OpenAI with Context": {
+            "main": [
+                [
+                    {
+                        "node": "Format RAG Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Format RAG Response": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "versionId": "1.0.0",
+    "meta": {
+        "instanceId": "n8n-ai-assistant-rag-workflow"
+    },
+    "id": "ai-assistant-rag-workflow",
+    "tags": []
+}

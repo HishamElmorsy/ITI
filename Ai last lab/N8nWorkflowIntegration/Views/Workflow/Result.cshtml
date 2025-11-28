@@ -1,0 +1,479 @@
+@{
+    ViewData["Title"] = "AI Response";
+}
+
+<main class="container">
+    <div class="result-header">
+        <h1><i class="fas fa-robot text-primary me-2"></i>AI Response</h1>
+        <p class="text-muted">Here's what the AI has generated based on your input</p>
+    </div>
+
+    <div class="result-grid">
+        <section class="card prompt-card">
+            <div class="card-header">
+                <i class="fas fa-question-circle me-2"></i>
+                <h2>Your Question</h2>
+            </div>
+            <div class="card-body">
+                <div class="content-box">
+                    @ViewBag.OriginalPrompt
+                </div>
+            </div>
+        </section>
+
+        <section class="card response-card">
+            <div class="card-header">
+                <i class="fas fa-robot me-2"></i>
+                <h2>AI Response</h2>
+            </div>
+            <div class="card-body">
+                <div class="content-box">
+                @if (ViewBag.Response != null)
+                {
+                    @Html.Raw(ViewBag.Response.Replace("\n", "<br>"))
+                }
+                else
+                {
+                    <p class="no-response">No response received.</p>
+                }
+            </div>
+        </div>
+
+        @if (ViewBag.References != null && ((List<N8nWorkflowIntegration.Models.Reference>)ViewBag.References).Count > 0)
+        {
+            <div class="section references-section">
+                <h2>📚 Knowledge Base References</h2>
+                <div class="references-list">
+                    @foreach (var reference in (List<N8nWorkflowIntegration.Models.Reference>)ViewBag.References)
+                    {
+                        <div class="reference-item">
+                            <div class="reference-header">
+                                <span class="reference-source">@reference.Source</span>
+                                <span class="reference-score">Score: @reference.Score?.ToString("F3")</span>
+                            </div>
+                            <p class="reference-text">@reference.Text</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="section metadata-section">
+            <h3>ℹ️ Metadata</h3>
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    <span class="metadata-label">Workflow ID:</span>
+                    <span class="metadata-value">@ViewBag.WorkflowId</span>
+                </div>
+                @if (ViewBag.Model != null)
+                {
+                    <div class="metadata-item">
+                        <span class="metadata-label">Model:</span>
+                        <span class="metadata-value">@ViewBag.Model</span>
+                    </div>
+                }
+                @if (ViewBag.Usage != null)
+                {
+                    var usage = (N8nWorkflowIntegration.Models.Usage)ViewBag.Usage;
+                    <div class="metadata-item">
+                        <span class="metadata-label">Tokens Used:</span>
+                        <span class="metadata-value">@usage.TotalTokens (Prompt: @usage.PromptTokens, Completion: @usage.CompletionTokens)</span>
+                    </div>
+                }
+                @if (ViewBag.RagEnabled)
+                {
+                    <div class="metadata-item">
+                        <span class="metadata-label">RAG:</span>
+                        <span class="metadata-value badge-success">Enabled ✓</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="@Url.Action("Ask", "Workflow")" class="btn btn-primary">
+                <span class="btn-icon">💬</span>
+                Ask Another Question
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Main Layout */
+    .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+        flex: 1;
+    }
+
+    /* Header */
+    .result-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .result-header h1 {
+        font-size: 2.25rem;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .result-header p {
+        font-size: 1.1rem;
+        color: var(--text-light);
+    }
+
+    /* Grid Layout */
+    .result-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @@media (min-width: 992px) {
+        .result-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    /* Cards */
+    .card {
+        background: var(--card-bg);
+        border-radius: var(--rounded);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .card-header h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--text);
+    }
+
+    .card-header i {
+        font-size: 1.25rem;
+        color: var(--primary);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Content Box */
+    .content-box {
+        background: var(--bg);
+        border-radius: calc(var(--rounded) - 0.25rem);
+        padding: 1.25rem;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--text);
+        white-space: pre-wrap;
+        border: 1px solid var(--border);
+    }
+
+    /* Prompt Card Specific */
+    .prompt-card .card-header {
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+
+    .prompt-card .card-header i {
+        color: var(--primary);
+    }
+
+    /* Response Card Specific */
+    .response-card .card-header {
+        background-color: rgba(124, 58, 237, 0.05);
+    }
+
+    .response-card .card-header i {
+        color: var(--secondary);
+    }
+
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: var(--rounded);
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+        font-size: 0.9375rem;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    .btn-outline:hover {
+        background: var(--bg);
+        border-color: var(--text-light);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+
+        .result-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .card {
+            border-radius: 0.75rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+        }
+    }
+    }
+
+    .result-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .result-header h1 {
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+    }
+
+    .result-content {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .section {
+        padding: 30px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .section:last-child {
+        border-bottom: none;
+    }
+
+    .section h2, .section h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 1.5rem;
+    }
+
+    .section h3 {
+        font-size: 1.2rem;
+    }
+
+    .prompt-section {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .prompt-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #555;
+    }
+
+    .response-section {
+        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+    }
+
+    .response-box {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        border-left: 4px solid #764ba2;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #333;
+        white-space: pre-wrap;
+    }
+
+    .no-response {
+        color: #999;
+        font-style: italic;
+    }
+
+    .references-section {
+        background: #f9f9f9;
+    }
+
+    .references-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .reference-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .reference-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .reference-source {
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    .reference-score {
+        font-size: 0.875rem;
+        color: #666;
+        background: #f0f0f0;
+        padding: 3px 10px;
+        border-radius: 12px;
+    }
+
+    .reference-text {
+        margin: 0;
+        color: #555;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .metadata-section {
+        background: #fafafa;
+    }
+
+    .metadata-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .metadata-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: white;
+        border-radius: 6px;
+    }
+
+    .metadata-label {
+        font-weight: 600;
+        color: #666;
+        min-width: 140px;
+    }
+
+    .metadata-value {
+        color: #333;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+
+    .badge-success {
+        background: #4caf50;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .actions {
+        padding: 30px;
+        text-align: center;
+        background: #f9f9f9;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-icon {
+        font-size: 1.3rem;
+    }
+</style>

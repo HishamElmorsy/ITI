@@ -1,0 +1,166 @@
+{
+  "name": "AI Assistant Workflow - OpenAI Integration",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook/ask",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger-001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "ai-assistant-webhook"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Node 2: Input Validation and LLM Payload Preparation\n\nconst body = items[0].json.body || items[0].json;\n\n// Validate prompt\nif (!body.prompt || typeof body.prompt !== 'string' || body.prompt.trim().length === 0) {\n  throw new Error('Invalid or missing prompt. Please provide a valid prompt string.');\n}\n\nif (body.prompt.length > 4000) {\n  throw new Error('Prompt is too long. Maximum length is 4000 characters.');\n}\n\n// Get environment variables\nconst llmModel = $env.LLM_MODEL || 'gpt-4o-mini';\nconst llmEndpoint = $env.LLM_ENDPOINT || 'https://api.openai.com/v1/chat/completions';\nconst llmApiKey = $env.LLM_API_KEY;\n\nif (!llmApiKey) {\n  throw new Error('LLM_API_KEY environment variable is not configured.');\n}\n\n// Prepare system prompt based on language\nconst language = body.metadata?.language || 'en';\nlet systemPrompt = 'You are a helpful AI assistant that provides concise, accurate, and friendly responses.';\n\nif (language === 'ar') {\n  systemPrompt = 'أنت مساعد ذكاء اصطناعي مفيد يقدم إجابات دقيقة وودية ومختصرة.';\n}\n\n// Prepare LLM API payload\nconst llmPayload = {\n  model: llmModel,\n  messages: [\n    {\n      role: 'system',\n      content: systemPrompt\n    },\n    {\n      role: 'user',\n      content: body.prompt\n    }\n  ],\n  temperature: 0.7,\n  max_tokens: 1000\n};\n\n// Return prepared data for next node\nreturn [\n  {\n    json: {\n      llmPayload: llmPayload,\n      llmEndpoint: llmEndpoint,\n      llmApiKey: llmApiKey,\n      originalRequest: {\n        userId: body.userId || 'anonymous',\n        prompt: body.prompt,\n        metadata: body.metadata || {},\n        timestamp: new Date().toISOString()\n      }\n    }\n  }\n];"
+      },
+      "id": "function-validate-001",
+      "name": "Validate & Prepare Payload",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.llmEndpoint }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.llmApiKey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": []
+        },
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.llmPayload) }}",
+        "options": {}
+      },
+      "id": "http-request-openai-001",
+      "name": "Call OpenAI API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Node 4: Format Response\n\nconst llmResponse = items[0].json;\nconst previousData = items[0].json;\n\n// Extract the LLM response text\nlet responseText = '';\nlet status = 'ok';\nlet errorMessage = null;\n\ntry {\n  // Check if we have a valid OpenAI response\n  if (llmResponse.choices && llmResponse.choices.length > 0) {\n    responseText = llmResponse.choices[0].message.content;\n  } else if (llmResponse.error) {\n    // Handle OpenAI error response\n    status = 'error';\n    errorMessage = llmResponse.error.message || 'Unknown error from LLM provider';\n    responseText = null;\n  } else {\n    // Unexpected response format\n    status = 'error';\n    errorMessage = 'Unexpected response format from LLM provider';\n    responseText = null;\n  }\n} catch (error) {\n  status = 'error';\n  errorMessage = error.message || 'Error processing LLM response';\n  responseText = null;\n}\n\n// Format the final response\nconst formattedResponse = {\n  status: status,\n  workflowId: $execution.id,\n  response: responseText,\n  message: errorMessage,\n  metadata: {\n    model: llmResponse.model || $env.LLM_MODEL || 'gpt-4o-mini',\n    usage: llmResponse.usage || null,\n    timestamp: new Date().toISOString()\n  }\n};\n\n// If successful, remove the message field\nif (status === 'ok') {\n  delete formattedResponse.message;\n}\n\nreturn [\n  {\n    json: formattedResponse\n  }\n];"
+      },
+      "id": "function-format-001",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-webhook-001",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Node 6: Database Logging (Optional - Placeholder)\n// This node is a placeholder for logging conversation history to a database\n// Uncomment and configure based on your database choice (PostgreSQL, MongoDB, etc.)\n\n/*\nconst conversationData = {\n  userId: items[0].json.originalRequest?.userId || 'anonymous',\n  prompt: items[0].json.originalRequest?.prompt,\n  response: items[0].json.response,\n  workflowId: $execution.id,\n  timestamp: new Date().toISOString(),\n  metadata: items[0].json.originalRequest?.metadata || {}\n};\n\n// TODO: Add your database insert logic here\n// Example for PostgreSQL:\n// INSERT INTO conversation_logs (user_id, prompt, response, workflow_id, timestamp, metadata)\n// VALUES ($1, $2, $3, $4, $5, $6)\n*/\n\n// Pass through the data unchanged\nreturn items;"
+      },
+      "id": "function-db-log-001",
+      "name": "Database Logging (Optional)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 450],
+      "disabled": true,
+      "notes": "Enable this node and configure your database connection to log conversation history"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate & Prepare Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & Prepare Payload": {
+      "main": [
+        [
+          {
+            "node": "Call OpenAI API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call OpenAI API": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Database Logging (Optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1.0.0",
+  "meta": {
+    "instanceId": "n8n-ai-assistant-workflow"
+  },
+  "id": "ai-assistant-openai-workflow",
+  "tags": []
+}

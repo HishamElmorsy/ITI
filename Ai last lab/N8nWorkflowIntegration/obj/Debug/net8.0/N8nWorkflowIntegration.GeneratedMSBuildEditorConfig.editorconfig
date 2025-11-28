@@ -1,0 +1,47 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = N8nWorkflowIntegration
+build_property.RootNamespace = N8nWorkflowIntegration
+build_property.ProjectDir = C:\Users\DELL\Downloads\Ai\N8nWorkflowIntegration\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\DELL\Downloads\Ai\N8nWorkflowIntegration
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/DELL/Downloads/Ai/N8nWorkflowIntegration/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/Downloads/Ai/N8nWorkflowIntegration/Views/Workflow/Ask.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29ya2Zsb3dcQXNrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/Downloads/Ai/N8nWorkflowIntegration/Views/Workflow/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29ya2Zsb3dcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/Downloads/Ai/N8nWorkflowIntegration/Views/Workflow/Result.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29ya2Zsb3dcUmVzdWx0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/Downloads/Ai/N8nWorkflowIntegration/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/DELL/Downloads/Ai/N8nWorkflowIntegration/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
